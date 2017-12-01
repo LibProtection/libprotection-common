@@ -1,2 +1,2 @@
-# libprotection-grammars
-Grammars shared by implementations of the LibProtection library
+# libprotection-common
+Components shared by implementations of LibProtection library
