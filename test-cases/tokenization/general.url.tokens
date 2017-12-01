@@ -1,7 +1,6 @@
 Url:Scheme:"https":[0..4]
 Url:Separator:":":[5..5]
-Url:Separator:"/":[6..6]
-Url:Separator:"/":[7..7]
+Url:Separator:"//":[6..7]
 Url:AuthorityEntry:"user":[8..11]
 Url:Separator:":":[12..12]
 Url:AuthorityEntry:"password":[13..20]
