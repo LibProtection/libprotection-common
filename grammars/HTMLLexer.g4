@@ -28,83 +28,41 @@
 
 lexer grammar HTMLLexer;
 
-HTML_COMMENT
+HtmlComment
     : '<!--' .*? '-->'
     ;
 
-HTML_CONDITIONAL_COMMENT
+HtmlConditionalComment
     : '<![' .*? ']>'
     ;
 
-XML_DECLARATION
+XmlDeclaration
     : '<?xml' .*? '>'
     ;
 
-CDATA
+Cdata
     : '<![CDATA[' .*? ']]>'
     ;
 
-DTD
+Dtd
     : '<!' .*? '>'
     ;
 
-SCRIPTLET
-    : '<?' .*? '?>'
-    | '<%' .*? '%>'
+SpecialTag
+    : '<' [?%] .*? '>'
     ;
 
-SEA_WS
-    :  (' '|'\t'|'\r'? '\n')+
+TagOpen
+    : '<' '/'? IDENTIFIER? -> pushMode(TAG)
     ;
 
-SCRIPT_OPEN
-    : '<script' .*? '>' ->pushMode(SCRIPT)
+HtmlText
+    : ~[<\u0000]+
     ;
 
-STYLE_OPEN
-    : '<style' .*? '>'  ->pushMode(STYLE)
-    ;
-
-TAG_OPEN
-    : '<' -> pushMode(TAG)
-    ;
-
-HTML_TEXT
-    : ~'<'+
-    ;
-
-ERROR_TEXT: . ;
-
-//
-// tag declarations
-//
-mode TAG;
-
-TAG_CLOSE
-    : '>' -> popMode
-    ;
-
-TAG_SLASH_CLOSE
-    : '/>' -> popMode
-    ;
-
-TAG_SLASH
-    : '/'
-    ;
-
-//
-// lexing mode for attribute values
-//
-TAG_EQUALS
-    : '=' -> pushMode(ATTVALUE)
-    ;
-
-TAG_NAME
-    : TAG_NameStartChar TAG_NameChar*
-    ;
-
-TAG_WHITESPACE
-    : [ \t\r\n] -> skip
+fragment
+IDENTIFIER
+    : IDENTIFIER_START_CHAR IDENTIFIER_CHAR*
     ;
 
 fragment
@@ -118,75 +76,88 @@ DIGIT
     ;
 
 fragment
-TAG_NameChar
-    : TAG_NameStartChar
+IDENTIFIER_CHAR
+    : IDENTIFIER_START_CHAR
     | '-'
     | '_'
     | '.'
+	| ':'
     | DIGIT
-    |   '\u00B7'
-    |   '\u0300'..'\u036F'
-    |   '\u203F'..'\u2040'
+    | '\u00B7'
+    | '\u0300'..'\u036F'
+    | '\u203F'..'\u2040'
     ;
 
 fragment
-TAG_NameStartChar
-    :   [:a-zA-Z]
-    |   '\u2070'..'\u218F'
-    |   '\u2C00'..'\u2FEF'
-    |   '\u3001'..'\uD7FF'
-    |   '\uF900'..'\uFDCF'
-    |   '\uFDF0'..'\uFFFD'
+IDENTIFIER_START_CHAR
+    : [:a-zA-Z]
+    | '\u2070'..'\u218F'
+    | '\u2C00'..'\u2FEF'
+    | '\u3001'..'\uD7FF'
+    | '\uF900'..'\uFDCF'
+    | '\uFDF0'..'\uFFFD'
     ;
 
-ERROR_TAG: . ;
+fragment
+WHITESPACE
+	: [ \t\r\n\u000C]+
+	;
+
+ErrorText: . ;
 
 //
-// <scripts>
+// tag declarations
 //
-mode SCRIPT;
+mode TAG;
 
-SCRIPT_BODY
-    : .*? '</script>' -> popMode
+TagClose
+    : '>' -> popMode
     ;
 
-SCRIPT_SHORT_BODY
-    : .*? '</>' -> popMode
+TagSlashClose
+    : '/>' -> popMode
     ;
 
-ERROR_SCRIPT: . ;
-
-//
-// <styles>
-//
-mode STYLE;
-
-STYLE_BODY
-    : .*? '</style>' -> popMode
+TagSlash
+    : '/'
     ;
 
-STYLE_SHORT_BODY
-    : .*? '</>' -> popMode
+TagEquals
+    : '=' -> pushMode(ATTRIBUTE)
     ;
 
-ERROR_STYLE: . ;
+TagWhiteSpace
+    : WHITESPACE -> skip
+    ;
+
+AttributeName
+    : IDENTIFIER
+    ;
+
+ErrorTag: . ;
 
 //
 // attribute values
 //
-mode ATTVALUE;
+mode ATTRIBUTE;
 
-// an attribute value may have spaces b/t the '=' and the value
-ATTVALUE_VALUE
-    : [ ]* ATTRIBUTE -> popMode
-    ;
+AttributeWhiteSpace
+	: WHITESPACE -> skip
+	;
 
-ATTRIBUTE
+AttributeSlash
+	: '/'
+	;
+
+AttributeValue
+	: ATTRIBUTE_VALUE -> popMode
+	;
+
+fragment
+ATTRIBUTE_VALUE
     : DOUBLE_QUOTE_STRING
     | SINGLE_QUOTE_STRING
     | ATTCHARS
-    | HEXCHARS
-    | DECCHARS
     ;
 
 fragment ATTCHAR
@@ -208,14 +179,6 @@ fragment ATTCHARS
     : ATTCHAR+ ' '?
     ;
 
-fragment HEXCHARS
-    : '#' [0-9a-fA-F]+
-    ;
-
-fragment DECCHARS
-    : [0-9]+ '%'?
-    ;
-
 fragment DOUBLE_QUOTE_STRING
     : '"' ~[<"]* '"'
     ;
@@ -224,4 +187,4 @@ fragment SINGLE_QUOTE_STRING
     : '\'' ~[<']* '\''
     ;
 
-ERROR_ATTVALUE: . ;
+ErrorAttribute: . ;
