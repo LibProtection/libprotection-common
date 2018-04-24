@@ -32,7 +32,7 @@ options {
     superClass=JavaScriptBaseLexer;
 }
 
-RegularExpressionLiteral:       {RegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
+RegularExpressionLiteral:       {this.RegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags;
 
 /// Line Terminators
 LineTerminator:                 [\r\n\u2028\u2029] -> channel(HIDDEN);
@@ -107,7 +107,7 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9]* ExponentPart?
 /// Numeric Literals
 
 HexIntegerLiteral:              '0' [xX] HexDigit+;
-OctalIntegerLiteral:            {!IsSrictMode()}? '0' [0-7]+;
+OctalIntegerLiteral:            {!this.IsSrictMode()}? '0' [0-7]+;
 OctalIntegerLiteral2:           '0' [oO] [0-7]+;
 BinaryIntegerLiteral:           '0' [bB] [01]+;
 
@@ -153,15 +153,15 @@ Import:                         'import';
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode
 
-Implements:                     {IsSrictMode()}? 'implements';
-Let:                            {IsSrictMode()}? 'let';
-Private:                        {IsSrictMode()}? 'private';
-Public:                         {IsSrictMode()}? 'public';
-Interface:                      {IsSrictMode()}? 'interface';
-Package:                        {IsSrictMode()}? 'package';
-Protected:                      {IsSrictMode()}? 'protected';
-Static:                         {IsSrictMode()}? 'static';
-Yield:                          {IsSrictMode()}? 'yield';
+Implements:                     {this.IsSrictMode()}? 'implements';
+Let:                            {this.IsSrictMode()}? 'let';
+Private:                        {this.IsSrictMode()}? 'private';
+Public:                         {this.IsSrictMode()}? 'public';
+Interface:                      {this.IsSrictMode()}? 'interface';
+Package:                        {this.IsSrictMode()}? 'package';
+Protected:                      {this.IsSrictMode()}? 'protected';
+Static:                         {this.IsSrictMode()}? 'static';
+Yield:                          {this.IsSrictMode()}? 'yield';
 
 /// Identifier Names and Identifiers
 
